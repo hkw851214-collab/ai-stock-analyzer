@@ -4,18 +4,23 @@ import time
 from google import genai
 import xml.etree.ElementTree as ET
 
-# 웹페이지 기본 설정 및 전체화면 버튼/헤더/푸터 강제 숨김 CSS
+# 웹페이지 기본 설정
 st.set_page_config(page_title="AI 주식 분석기", page_icon="📈", layout="centered")
 
+# --- 강력한 전체화면 방지 및 헤더/푸터 완전 제거 CSS ---
 hide_streamlit_style = """
 <style>
-/* 전체화면(Full screen) 버튼 강제 삭제 */
+/* 우측 상단 기본 헤더 및 메뉴바 완전 제거 */
+[data-testid="stHeader"] {display: none !important;}
+header {display: none !important;}
+
+/* 하단 Streamlit 워터마크 및 전체화면 버튼 포함 푸터 구역 완전 제거 */
+[data-testid="stFooter"] {display: none !important;}
+footer {display: none !important;}
+
+/* 전체화면(Full screen) 버튼 및 관련 아이콘 특정 강제 삭제 */
 button[title="View fullscreen"] {display: none !important;}
 .st-emotion-cache-1rqz50n {display: none !important;}
-/* 우측 상단 기본 헤더 및 메뉴바 제거 */
-header {visibility: hidden !important;}
-/* 하단 Streamlit 워터마크 제거 */
-footer {visibility: hidden !important;}
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)

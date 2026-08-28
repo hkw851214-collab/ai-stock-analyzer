@@ -4,7 +4,7 @@ import time
 from google import genai
 import xml.etree.ElementTree as ET
 
-API_KEY = "AQ.Ab8RN6JkQtPx3ki7e7YJ58oPYZG_oGemYcL8B76_FO-uXJhGMg"
+API_KEY = st.secrets["GEMINI_API_KEY"]
 
 # 웹페이지 기본 설정
 st.set_page_config(page_title="AI 주식 분석기", page_icon="📈", layout="centered")

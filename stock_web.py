@@ -64,10 +64,12 @@ if st.button("분석 및 예상 🚀"):
             
             try:
                 client = genai.Client(api_key=API_KEY)
-                ai_result = client.models.generate_content(model='gemini-2.5-flash', contents=prompt).text
+                # 대표님이 원래 쓰시던 3.6 버전으로 롤백
+                ai_result = client.models.generate_content(model='gemini-3.6-flash', contents=prompt).text
             except Exception as e:
-                ai_result = "오류가 발생했습니다. 잠시 후 다시 시도해주세요."
-        
+                # 에러 발생 시 진짜 원인을 화면에 직접 출력
+                ai_result = f"🚨 실제 에러 원인: {e}"
+                
         # 결과 출력
         st.success("✨ 분석이 완료되었습니다!")
         st.subheader(f"[{stock_name}] AI 심층 리포트")

@@ -4,10 +4,23 @@ import time
 from google import genai
 import xml.etree.ElementTree as ET
 
-API_KEY = st.secrets["GEMINI_API_KEY"]
-
-# 웹페이지 기본 설정
+# 웹페이지 기본 설정 및 전체화면 버튼/헤더/푸터 강제 숨김 CSS
 st.set_page_config(page_title="AI 주식 분석기", page_icon="📈", layout="centered")
+
+hide_streamlit_style = """
+<style>
+/* 전체화면(Full screen) 버튼 강제 삭제 */
+button[title="View fullscreen"] {display: none !important;}
+.st-emotion-cache-1rqz50n {display: none !important;}
+/* 우측 상단 기본 헤더 및 메뉴바 제거 */
+header {visibility: hidden !important;}
+/* 하단 Streamlit 워터마크 제거 */
+footer {visibility: hidden !important;}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+API_KEY = st.secrets["GEMINI_API_KEY"]
 
 st.title("📈 실시간 AI 주식 심층 분석기")
 st.markdown("궁금한 종목명을 입력하시면 AI가 실시간 뉴스를 분석하여 펀더멘털 및 차트 전망을 제시합니다.")
@@ -46,7 +59,7 @@ if st.button("분석 및 예상 🚀"):
             
             try:
                 client = genai.Client(api_key=API_KEY)
-                ai_result = client.models.generate_content(model='gemini-3.6-flash', contents=prompt).text
+                ai_result = client.models.generate_content(model='gemini-2.5-flash', contents=prompt).text
             except Exception as e:
                 ai_result = "오류가 발생했습니다. 잠시 후 다시 시도해주세요."
         

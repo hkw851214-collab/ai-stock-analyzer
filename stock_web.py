@@ -36,10 +36,25 @@ stock_name = st.text_input("🔍 분석할 종목명을 입력하세요 (예: �
 # [분석 및 예상] 버튼을 눌렀을 때 실행되는 로직
 if st.button("분석 및 예상 🚀"):
     if stock_name:
-        # 1차 로딩 바 (방문자 체류시간 확보용)
-        with st.spinner(f"'{stock_name}' 실시간 수급 데이터 및 뉴스 크롤링 중... (약 10초 소요)"):
-            time.sleep(4) # 체류시간 강제 지연
+        # 1. 5분 대기열 (체류시간 확보 및 API 방어)
+        status_text = st.empty()
+        progress_bar = st.progress(0)
+        
+        total_seconds = 300
+        for i in range(total_seconds):
+            remaining = total_seconds - i
+            mins, secs = divmod(remaining, 60)
+            time_str = f"{mins:02d}:{secs:02d}"
             
+            status_text.warning(f"🔥 방대한 실시간 수급 및 차트 데이터 딥러닝 분석 중... 남은 시간 [ {time_str} ]")
+            progress_bar.progress((i + 1) / total_seconds)
+            time.sleep(1)
+        
+        status_text.success("✅ 분석이 완료되었습니다! 리포트를 생성합니다.")
+        progress_bar.empty()
+
+        # 2. 뉴스 크롤링 및 제미나이 API 실제 호출
+        with st.spinner("최종 리포트 화면 출력 중..."):
             news_items = []
             try:
                 res = requests.get(f"https://news.google.com/rss/search?q={stock_name}+특징주+공시+전망&hl=ko&gl=KR&ceid=KR:ko", headers={'User-Agent': 'Mozilla/5.0'})
@@ -50,8 +65,6 @@ if st.button("분석 및 예상 🚀"):
             
             news_text = "\n".join([f"- {n}" for n in news_items]) if news_items else "최근 특별한 뉴스가 없습니다."
 
-        # 2차 로딩 바
-        with st.spinner("AI가 기업 재무구조 파악 및 향후 차트 방향성을 분석하고 있습니다..."):
             prompt = f"""
             너는 15년 차 베테랑 주식 애널리스트야. 사용자가 '{stock_name}' 종목 분석을 요청했어.
             현재 수집된 최신 뉴스는 다음과 같아: {news_text}
@@ -64,14 +77,11 @@ if st.button("분석 및 예상 🚀"):
             
             try:
                 client = genai.Client(api_key=API_KEY)
-                # 대표님이 원래 쓰시던 3.6 버전으로 롤백
                 ai_result = client.models.generate_content(model='gemini-3.6-flash', contents=prompt).text
             except Exception as e:
-                # 에러 발생 시 진짜 원인을 화면에 직접 출력
                 ai_result = f"🚨 실제 에러 원인: {e}"
                 
-        # 결과 출력
-        st.success("✨ 분석이 완료되었습니다!")
+        # 3. 결과 출력
         st.subheader(f"[{stock_name}] AI 심층 리포트")
         if news_items:
             with st.expander("📰 참고한 뉴스 헤드라인 보기"):
